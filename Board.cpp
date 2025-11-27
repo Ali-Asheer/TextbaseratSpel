@@ -43,7 +43,8 @@ Board::Board(int r, int c, int mines)             // Initialize board with given
       totalMines(mines),                         // Initialize member variables
       mine(r, std::vector<bool>(c, false)),      // Initialize mine vector
       revealed(r, std::vector<bool>(c, false)),  // Initialize revealed vector
-      neighbors(r, std::vector<int>(c, 0))       // Initialize neighbors vector
+      neighbors(r, std::vector<int>(c, 0)),       // Initialize neighbors vector
+      flagged(r, std::vector<bool>(c, false))     // Initialize flagged vector
 {
     std::vector<int> idx(rows * cols);  // Create a vector of indices
     std::iota(idx.begin(), idx.end(), 0);  // Fill with 0, 1, 2, ..., rows*cols-1
@@ -90,14 +91,19 @@ void Board::revealAllMines() {
 
 // Reveal a cell
 void Board::revealCell(int r, int c) {
-    if (!inBounds(r, c) || revealed[r][c]) return;
-
+    if (!inBounds(r, c) || revealed[r][c] || flagged[r][c]) return;
     revealed[r][c] = true;
 
     if (mine[r][c]) {
         lost = true;
         revealAllMines();
     }
+}
+
+// Toggle flag on a cell
+void Board::toggleFlag(int r, int c) {
+    if (!inBounds(r, c) || revealed[r][c]) return;
+    flagged[r][c] = !flagged[r][c];
 }
 
 // Check if all non-mine cells are revealed
@@ -133,7 +139,10 @@ void Board::print() const {
                 else
                     std::cout << "| " << neighbors[r][c] << " ";
             } else {
-                std::cout << "|   ";
+                if (flagged[r][c])
+                    std::cout << "| F ";
+                else
+                    std::cout << "|   ";
             }
         }
         std::cout << "|\n";
@@ -197,6 +206,11 @@ proceed:
         out << "\n";
     }
 
+    for (auto& row : flagged) {
+        for (bool b : row) out << (b ? 1 : 0) << " ";
+        out << "\n";
+    }
+
     return {outFilename, true};
 }
 
@@ -224,6 +238,12 @@ bool Board::loadFromFile(const std::string& filename) {
             in >> val;    // Read revealed data
             revealed[r][c] = (val == 1);
         }
+
+    for (int r = 0; r < rows; r++)
+        for (int c = 0; c < cols; c++) {
+            in >> val;  // Read flagged data
+            flagged[r][c] = (val == 1);
+    }
 
     countNeighbors();
     lost = false;

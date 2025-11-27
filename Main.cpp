@@ -33,8 +33,9 @@ int main() {
             break;
         }
 
-        std::cout << "<> Vilken ruta vill du undersöka?\n";
+        std::cout << "<> Vilken ruta vill du undersöka(ex. b2)?\n";
         std::cout << "<> Skriv 'save' för att spara spelet.\n";
+        std::cout << "<> Skriv 'flag' och ruta koordinater för att flagga en ruta. (ex. flag b2)\n";
         std::cout << "<> Skriv 'load' för att ladda ett annat spel.\n> ";
 
         std::string cmd;
@@ -42,6 +43,18 @@ int main() {
         lastInput = cmd;
         std::cout << "========================================================="
                      "=========\n";
+
+        if (cmd == "flag") {  // Flag a cell
+            std::string pos;
+            std::cin >> pos;
+            int r, c;
+            if (!parseCoord(pos, r, c)) {
+                std::cout << "Ogiltig koordinat!\n";
+                continue;
+            }
+                board->toggleFlag(r, c);
+            continue;
+        }             
 
         if (cmd == "save") {  // Save game
             std::string fname;
