@@ -14,6 +14,7 @@ class Board {
                   int c) const;  // Check if coordinates are within bounds
     std::pair<std::string, bool> saveToFile(const std::string& filename) const;
     bool loadFromFile(const std::string& filename);
+    void toggleFlag(int r, int c);
 
    private:
     int rows, cols, totalMines;
@@ -22,9 +23,11 @@ class Board {
     std::vector<std::vector<bool>> mine;
     std::vector<std::vector<bool>> revealed;
     std::vector<std::vector<int>> neighbors;
+    std::vector<std::vector<bool>> flagged;
 
     void countNeighbors();
     void revealAllMines();
+    
 };
 
 // Parse coordinates from string (e.g., "b2") into row and column
